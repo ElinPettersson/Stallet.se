@@ -24,7 +24,7 @@ struct ContentView: View {
                         .resizable()
                 }
             
-            UserView()
+            UserView(user: User(name: "Elin", email: "elin@test.se", password: "AIK"))
                 .tabItem {
                     Image(systemName: "person.crop.circle")
                         .resizable()

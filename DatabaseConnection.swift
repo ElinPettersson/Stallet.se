@@ -13,45 +13,47 @@ class DatabaseConnection: ObservableObject {
     @Published var userLoggedIn = false
     @Published var currentUser: User?
     
-    var BASE_URL = URL(string: "http://192.168.0.24:3000")!
+    var BASE_URL = URL(string: "http://0.0.0.0:3000")!
     
-    func LoginUser(username: String, password: String) {
+    func LoginUser(email: String, password: String) {
         
-        let user = User(email: username, password: password)
+        let user = User(email: email, password: password)
+        
+        guard let url = URL(string:"\(BASE_URL)/login") else {
+            print("error at line 31")
+            return
+        }
+        var request = URLRequest(url: url)
+        print(request)
         
         let encoder = JSONEncoder()
         encoder.outputFormatting = .prettyPrinted
         
-        let data = try! encoder.encode(user)
-        print(String(data: data, encoding: .utf8)!)
-        
-        let jsonData = try? JSONSerialization.data(withJSONObject: data)
-        
-        guard let url = URL(string:"\(BASE_URL)/login") else {
+        request.httpMethod = "POST"
+        request.setValue("Application/json", forHTTPHeaderField: "Content-Type")
+        guard let httpBody = try? encoder.encode(user) else {
+            print("Couldnt encode request body")
             return
         }
+        request.httpBody = httpBody
+        request.timeoutInterval = 20
         
-//        var request = URLRequest(url: url, timeoutInterval: .infinity)
-//
-//        print("Starting fetch")
-//
-//        request.httpMethod = "POST"
-//        request.httpBody = jsonData
-//
-//        let task = URLSession.shared.dataTask(with: request) { data, response, error in
-//
-//            print("Fetch Data function \(String(describing: error?.localizedDescription))")
-//            guard let data = data, error == nil else {
-//                print(String(describing: error))
-//                return
-//            }
-//            let decodedResponse = try? JSONSerialization.jsonObject(with: data, options: [])
-//            if let decodedResponse = decodedResponse as? [String: Any] {
-//                print(decodedResponse)
-//            } else {
-//                print("Could not decode at line 52")
-//            }
-//        }
-//        task.resume()
+        let task = URLSession.shared.dataTask(with: request) { data, response, error in
+            if let response = response {
+                print(response)
+            }
+            if let data = data {
+                do {
+                    let json = try JSONSerialization.jsonObject(with: data, options: [])
+                    print(json)
+                } catch {
+                    print(error)
+                }
+            }
+        }
+        task.resume()
     }
+}
+
+func RegisterUser(name: String, email: String, password: String) {
 }

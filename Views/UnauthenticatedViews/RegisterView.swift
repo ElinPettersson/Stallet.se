@@ -11,7 +11,7 @@ struct RegisterView: View {
     
     @EnvironmentObject var dbConnection: DatabaseConnection
     
-    @State private var username: String = ""
+    @State private var email: String = ""
     @State private var password: String = ""
     
     var body: some View {
@@ -29,9 +29,9 @@ struct RegisterView: View {
                 .padding(.bottom, 32)
             
             VStack(alignment: .leading) {
-                Text("Username")
+                Text("Email")
                     .foregroundColor(.white)
-                TextField("", text: $username)
+                TextField("", text: $email)
                     .disableAutocorrection(true)
                     .padding(.bottom, 8)
                 

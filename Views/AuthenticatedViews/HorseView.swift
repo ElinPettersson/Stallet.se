@@ -9,7 +9,7 @@ import SwiftUI
 
 struct HorseView: View {
     
-    var horse: Horse
+    @State var horse: Horse
     
     let pointRange: Double = 100.0
     
@@ -35,7 +35,7 @@ struct HorseView: View {
                         .foregroundColor(.white)
                 }
             })
-            .aspectRatio(contentMode: .fit)
+            .aspectRatio(contentMode: .fill)
             .clipShape(Rectangle())
             .overlay(Rectangle().stroke(Color("darkPurple"), lineWidth: 8))
             .cornerRadius(2)

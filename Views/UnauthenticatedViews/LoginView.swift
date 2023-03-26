@@ -11,7 +11,7 @@ struct LoginView: View {
     
     @EnvironmentObject var dbConnection: DatabaseConnection
     
-    @State var username: String = ""
+    @State var email: String = ""
     @State var password: String = ""
     
     var body: some View {
@@ -25,9 +25,9 @@ struct LoginView: View {
                     .padding(.bottom, 48)
                 
                 VStack(alignment: .leading) {
-                    Text("Username")
+                    Text("Email")
                         .foregroundColor(.white)
-                    TextField("", text: $username)
+                    TextField("", text: $email)
                         .disableAutocorrection(true)
                         .padding(.bottom, 8)
                     
@@ -41,7 +41,11 @@ struct LoginView: View {
                 
                 Button(action: {
                     print("Login button is pressed")
-                    dbConnection.LoginUser(username: username, password: password)
+                    if email == "", password == "" {
+                        print("Fields are empty")
+                    } else {
+                        dbConnection.LoginUser(email: email, password: password)
+                    }
                 }, label: {
                     Text("Sign in")
                         .frame(width: 160)
