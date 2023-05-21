@@ -9,40 +9,55 @@ import SwiftUI
 
 struct UserView: View {
     
-    @State var user: User
+    @EnvironmentObject var db: DatabaseConnection
+    @ObservedObject var appModel: AppModel
+    
+//    @State private var selectedHorse: Horse?
+//    @State private var isShowingHorseDetail = false
     
     var body: some View {
-        VStack {
-            Spacer()
-            
-            Text("\(user.email)s stable")
-                .font(.largeTitle.lowercaseSmallCaps())
-                .foregroundColor(Color("textWhite"))
-                .shadow(color: Color(.black), radius: 2, x: 0, y: 2)
-                .padding(.top, 44)
-            
-            
-            ScrollView {
-                 Text("Horse list")
+        NavigationStack {
+            VStack {
+                
+                Spacer()
+                
+                Button(action: {
+                    db.logoutUser()
+                }, label: {
+                    Image(systemName: "door.french.open")
+                        .foregroundColor(.black)
+                })
+                
+                Text("\(db.currentUser?.name ?? "")s stable")
                     .font(.largeTitle.lowercaseSmallCaps())
                     .foregroundColor(Color("textWhite"))
                     .shadow(color: Color(.black), radius: 2, x: 0, y: 2)
-                    .padding(.vertical, 8)
-            }
-            .foregroundColor(Color("white"))
-            .frame(maxWidth: .infinity)
-            .padding(16)
-            Spacer()
-        }
-        .background(Color("lightPurple"))
-        .ignoresSafeArea()
-    }
-}
+                    .padding(.top, 24)
+                
+                
+                ScrollView {
+                    
+                    if db.currentUser != nil {
+                        if let horseList = db.horseInList {
+                            
+                            ForEach(horseList, id: \.name) { horse in
 
-struct UserView_Previews: PreviewProvider {
-    static var previews: some View {
-        NavigationView {
-            UserView(user: User(name: "Elin", email: "elin@test.se", password: "AIK"))
+                                NavigationLink(destination: {
+                                    HorseView(selectedHorse: horse)
+
+                                }, label: {
+                                    HorseListItem(horseName: horse.name, horseImage: horse.image ?? "https://source.unsplash.com/featured/?horse", gender: horse.gender, breed: horse.breed)
+                                })
+                            }
+                        }
+                    }
+                }
+                .foregroundColor(Color("white"))
+                .frame(maxWidth: .infinity)
+                .padding(16)
+                Spacer()
+            }
+            .background(Color("lightPurple"))
         }
     }
 }

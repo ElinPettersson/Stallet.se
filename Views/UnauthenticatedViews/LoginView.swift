@@ -9,13 +9,13 @@ import SwiftUI
 
 struct LoginView: View {
     
-    @EnvironmentObject var dbConnection: DatabaseConnection
+    @EnvironmentObject var db: DatabaseConnection
     
-    @State var email: String = ""
-    @State var password: String = ""
+    @State private var email: String = ""
+    @State private var password: String = ""
     
     var body: some View {
-        NavigationView {
+        NavigationStack {
             VStack {
                 Spacer()
                 Text("Stallet.se")
@@ -28,12 +28,14 @@ struct LoginView: View {
                     Text("Email")
                         .foregroundColor(.white)
                     TextField("", text: $email)
+                        .autocapitalization(.none)
                         .disableAutocorrection(true)
                         .padding(.bottom, 8)
                     
                     Text("Password")
                         .foregroundColor(Color("textWhite"))
-                    TextField("", text: $password)
+                    SecureField("", text: $password)
+                        .autocapitalization(.none)
                         .disableAutocorrection(true)
                 }
                 .padding(.horizontal, 32)
@@ -44,7 +46,9 @@ struct LoginView: View {
                     if email == "", password == "" {
                         print("Fields are empty")
                     } else {
-                        dbConnection.LoginUser(email: email, password: password)
+                        
+                        db.loginUser(email: email, password: password)
+                        
                     }
                 }, label: {
                     Text("Sign in")
@@ -71,7 +75,6 @@ struct LoginView: View {
             }
             .background(Color("lightPurple"))
             .textFieldStyle(.roundedBorder)
-            .ignoresSafeArea()
             .shadow(color: Color("black"), radius: 2, x: 0, y: 2)
         }
     }

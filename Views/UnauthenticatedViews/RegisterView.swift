@@ -9,10 +9,12 @@ import SwiftUI
 
 struct RegisterView: View {
     
-    @EnvironmentObject var dbConnection: DatabaseConnection
+    @EnvironmentObject var db: DatabaseConnection
     
+    @State private var name: String = ""
     @State private var email: String = ""
     @State private var password: String = ""
+    @State private var repeatedPassword: String = ""
     
     var body: some View {
         VStack {
@@ -29,6 +31,12 @@ struct RegisterView: View {
                 .padding(.bottom, 32)
             
             VStack(alignment: .leading) {
+                Text("Name")
+                    .foregroundColor(.white)
+                TextField("", text: $name)
+                    .disableAutocorrection(true)
+                    .padding(.bottom, 8)
+                
                 Text("Email")
                     .foregroundColor(.white)
                 TextField("", text: $email)
@@ -43,7 +51,7 @@ struct RegisterView: View {
                 
                 Text("Repeat password")
                     .foregroundColor(.white)
-                TextField("", text: $password)
+                TextField("", text: $repeatedPassword)
                     .disableAutocorrection(true)
             }
             .padding(.horizontal, 32)
@@ -51,6 +59,15 @@ struct RegisterView: View {
             
             Button(action: {
                 print("Register button is pressed")
+                if name == "", email == "", password == "" {
+                    print("Fields are empty")
+                } else if password != repeatedPassword {
+                    print("Passwords do not match")
+                } else {
+                    Task {
+                        await db.RegisterUser(name: name, email: email)
+                    }
+                }
             }, label: {
                 Text("Register")
                     .frame(width: 160)
@@ -63,7 +80,6 @@ struct RegisterView: View {
         }
         .background(Color("lightPurple"))
         .textFieldStyle(.roundedBorder)
-        .ignoresSafeArea()
         .shadow(color: .black, radius: 2, x: 0, y: 2)
     }
 }

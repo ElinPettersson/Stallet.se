@@ -14,7 +14,7 @@ struct Stallet_seApp: App {
     
     var body: some Scene {
         WindowGroup {
-            LoginView().environmentObject(dbConnection)
+            ContentView(appModel: .init(selectedTab: .home)).environmentObject(dbConnection)
         }
     }
 }

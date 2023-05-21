@@ -7,10 +7,20 @@
 
 import Foundation
 
-struct User: Codable, Identifiable {
-    var id: String?
-    var name: String?
+struct User: Codable {
+    var name: String
     var email: String
-    var password: String
-    var horseIds: [Horse]?
+    var horsesId: [String]
+    
+    enum CodingKeys: String, CodingKey {
+        case name
+        case email
+        case horsesId = "horsesId"
+    }
+}
+
+struct AuthResponse: Codable {
+    let success: Bool
+    let message: String
+    let token: String
 }

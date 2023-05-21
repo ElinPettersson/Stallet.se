@@ -7,43 +7,72 @@
 
 import SwiftUI
 
+final class AppModel: ObservableObject {
+    enum Tab {
+      case home, horses, stable
+    }
+    @Published var showAuthenticatedView = false
+    @Published var isAuthenticated = false
+    @Published var selectedTab: Tab
+    
+    init(
+        selectedTab: Tab
+    ) {
+        self.selectedTab = selectedTab
+    }
+}
+
 struct ContentView: View {
     
     @EnvironmentObject var dbConnection: DatabaseConnection
+    @ObservedObject var appModel: AppModel
+    
     
     var body: some View {
-        TabView {
-            HomeView()
-                .tabItem {
-                    Image(systemName: "house")
-                        .resizable()
+        ZStack {
+            if dbConnection.isAuthenticated {
+                TabView(selection: $appModel.selectedTab) {
+                    
+                    HomeView(appModel: .init(selectedTab: .home))
+                    
+                        .tabItem {
+                            Image(systemName: "house")
+                                .resizable().foregroundColor(.white)
+                        }
+                        .tag(AppModel.Tab.home)
+                    AddHorseView()
+                        .tabItem {
+                            Image(systemName: "figure.equestrian.sports")
+                                .resizable()
+                        }
+                        .tag(AppModel.Tab.horses)
+                    
+                    UserView(appModel: .init(selectedTab: .stable))
+                        .tabItem {
+                            Image(systemName: "person.crop.circle")
+                                .resizable()
+                        }
+                        .tag(AppModel.Tab.stable)
                 }
-            HorseView(horse: Horse(id: "", name: "Hoffa", born: 2006, gender: "", breed: "", caliber: "", type: "", color: "", strength: 5, speed: 5, endurance: 5, maintenance: 5, description: "HEJEHHEJHEJEHEJEEHEJE HEJEHEJEH HEJEH HEJ Hej HEJEHJE JEHJEHJEH EJEIVNKNV EFHIERNVKE HEJEHHEJHEJEHEJEEHEJE HEJEHEJEH HEJEH HEJ Hej HEJEHJE JEHJEHJEH EJEIVNKNV EFHIERNVKE HEJEHHEJHEJEHEJEEHEJE HEJEHEJEH HEJEH HEJ Hej HEJEHJE JEHJEHJEH EJEIVNKNV EFHIERNVKE HEJEHHEJHEJEHEJEEHEJE HEJEHEJEH HEJEH HEJ Hej HEJEHJE JEHJEHJEH EJEIVNKNV EFHIERNVKE HEJEHHEJHEJEHEJEEHEJE HEJEHEJEH HEJEH HEJ Hej HEJEHJE JEHJEHJEH EJEIVNKNV EFHIERNVKE HEJEHHEJHEJEHEJEEHEJE HEJEHEJEH HEJEH HEJ Hej HEJEHJE JEHJEHJEH EJEIVNKNV EFHIERNVKE HEJEHHEJHEJEHEJEEHEJE HEJEHEJEH HEJEH HEJ Hej HEJEHJE JEHJEHJEH EJEIVNKNV EFHIERNVKE HEJEHHEJHEJEHEJEEHEJE HEJEHEJEH HEJEH HEJ Hej HEJEHJE JEHJEHJEH EJEIVNKNV EFHIERNVKE HEJEHHEJHEJEHEJEEHEJE HEJEHEJEH HEJEH HEJ Hej HEJEHJE JEHJEHJEH EJEIVNKNV EFHIERNVKE HEJEHHEJHEJEHEJEEHEJE HEJEHEJEH", image: "https://i.pinimg.com/originals/1c/96/f2/1c96f2dfb525390b5b6f0a945f26203a.jpg", owner: ""))
-                .tabItem {
-                    Image(systemName: "figure.equestrian.sports")
-                        .resizable()
+                .onAppear {
+                    let appearance = UITabBarAppearance()
+                    appearance.backgroundColor = UIColor(Color("lightPurple"))
+                    appearance.stackedLayoutAppearance.normal.iconColor = UIColor(Color("normalTabbarColor"))
+                    appearance.stackedLayoutAppearance.selected.iconColor = UIColor(Color("selectedTabbarColor"))
+                    UITabBar.appearance().standardAppearance = appearance
+                    UITabBar.appearance().scrollEdgeAppearance = appearance
+                    if dbConnection.isAuthenticated {
+                        print("IS AUTH")
+                    }
                 }
-            
-            UserView(user: User(name: "Elin", email: "elin@test.se", password: "AIK"))
-                .tabItem {
-                    Image(systemName: "person.crop.circle")
-                        .resizable()
-                }
+            } else {
+                LoginView()
+            }
         }
         .onAppear {
-            let appearance = UITabBarAppearance()
-            appearance.backgroundColor = UIColor(Color("lightPurple"))
-            UITabBar.appearance().standardAppearance = appearance
-            UITabBar.appearance().scrollEdgeAppearance = appearance
+            if appModel.isAuthenticated {
+                dbConnection.getUser(email: dbConnection.currentUser?.email ?? "", token: dbConnection.token ?? "")
+            }
         }
     }
 }
-
-struct ContentView_Previews: PreviewProvider {
-    static var previews: some View {
-        NavigationView {
-            ContentView()
-        }
-    }
-}
-
